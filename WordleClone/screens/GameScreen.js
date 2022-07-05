@@ -4,20 +4,16 @@ import { StyleSheet, Text, View } from "react-native";
 import Keyboard from "../components/Keyboard";
 import { colors } from "../constants/theme";
 
-const ROWS = 6;
-
 const GameScreen = () => {
-  const rows = [];
+  const word = "hello";
+  const letters = word.split("");
+  const [tries, setTries] = useState(6);
+  const [rows, setRows] = useState(
+    new Array(tries).fill(new Array(letters.length).fill(""))
+  );
 
-  const renderRows = () => {
-    for (let i = 0; i < ROWS; i++) {
-      rows.push(
-        <View key={i} style={{ backgroundColor: "green" }}>
-          <Text>dhola</Text>
-        </View>
-      );
-    }
-    return rows;
+  const onKeyPressed = (key) => {
+    console.log(key);
   };
 
   return (
@@ -25,17 +21,18 @@ const GameScreen = () => {
       <Text style={styles.title}>WORDLE</Text>
 
       <View style={styles.map}>
-        <View style={styles.row}>
-          <View style={styles.cell}></View>
-          <View style={styles.cell}></View>
-          <View style={styles.cell}></View>
-          <View style={styles.cell}></View>
-          <View style={styles.cell}></View>
-          <View style={styles.cell}></View>
-        </View>
+        {rows.map((row, index) => (
+          <View key={index} style={styles.row}>
+            {row.map((cell, index) => (
+              <View key={index} style={styles.cell}>
+                <Text style={styles.guess}>{cell.toUpperCase()}</Text>
+              </View>
+            ))}
+          </View>
+        ))}
       </View>
       <View style={styles.keyboardContainer}>
-        <Keyboard />
+        <Keyboard onKeyPressed={onKeyPressed} />
       </View>
     </View>
   );
@@ -62,21 +59,28 @@ const styles = StyleSheet.create({
   },
   map: {
     paddingVertical: 20,
-    //backgroundColor: "red",
     flex: 1,
     width: "100%",
   },
   row: {
     flexDirection: "row",
-    //backgroundColor: "blue",
+    justifyContent: "center",
     width: "100%",
-    height: 50,
+    marginBottom: 10,
   },
   cell: {
-    borderColor: colors.grey,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: colors.darkgrey,
     borderWidth: 2,
-    marginHorizontal: 8,
+    marginHorizontal: 5,
+    maxWidth: 50,
     flex: 1,
     aspectRatio: 1,
+  },
+  guess: {
+    color: colors.lightgrey,
+    fontSize: 32,
+    fontWeight: "bold",
   },
 });
