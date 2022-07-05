@@ -25,6 +25,6 @@ export const keys = [
   [ENTER, "z", "x", "c", "v", "b", "n", "m", CLEAR],
 ];
 
-const appTheme = { colors };
+const appTheme = { colors, colorsToEmoji, ENTER, CLEAR, keys };
 
 export default appTheme;
