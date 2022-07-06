@@ -1,6 +1,6 @@
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { CLEAR, ENTER, colors } from "../constants/theme";
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
 
 import Keyboard from "../components/Keyboard";
 import axios from "axios";
@@ -62,6 +62,40 @@ const GameScreen = () => {
     return colors.darkgrey;
   };
 
+  const checkGame = () => {
+    if (rows[currentRow].join("").toUpperCase() === letters.join("")) {
+      Alert.alert("Ganaste!", "", [
+        {
+          text: "Jugar de nuevo",
+          onPress: () => {
+            // GET NEW WORD FROM ENDPOINT
+            setRows(new Array(tries).fill(new Array(letters.length).fill("")));
+            setCurrentRow(0);
+            setCurrentCell(0);
+            setGreenCaps([]);
+            setYellowCaps([]);
+            setGreyCaps([]);
+          },
+        },
+      ]);
+    } else if (currentRow === tries - 1) {
+      Alert.alert("Perdiste!", "", [
+        {
+          text: "Jugar de nuevo",
+          onPress: () => {
+            // GET NEW WORD FROM ENDPOINT
+            setRows(new Array(tries).fill(new Array(letters.length).fill("")));
+            setCurrentRow(0);
+            setCurrentCell(0);
+            setGreenCaps([]);
+            setYellowCaps([]);
+            setGreyCaps([]);
+          },
+        },
+      ]);
+    }
+  };
+
   const onKeyPressed = (key) => {
     let newArr = [...rows.map((row) => [...row])];
     if (key === CLEAR) {
@@ -71,8 +105,11 @@ const GameScreen = () => {
       }
     } else if (key === ENTER) {
       if (rows[currentRow][rows[currentRow].length - 1] !== "") {
-        setCurrentRow(currentRow + 1);
-        setCurrentCell(0);
+        if (currentRow < tries - 1) {
+          setCurrentRow(currentRow + 1);
+          setCurrentCell(0);
+        }
+        checkGame();
       }
     } else {
       if (currentCell < rows[currentRow].length) {
