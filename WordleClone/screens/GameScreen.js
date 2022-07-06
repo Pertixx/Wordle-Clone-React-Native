@@ -6,7 +6,7 @@ import Keyboard from "../components/Keyboard";
 import axios from "axios";
 
 const GameScreen = () => {
-  const [word, setWord] = useState("HOLA");
+  const [word, setWord] = useState("");
   const [letters, setLetters] = useState([]);
   const [tries, setTries] = useState(6);
   const [rows, setRows] = useState(
@@ -18,15 +18,27 @@ const GameScreen = () => {
   const [yellowCaps, setYellowCaps] = useState([]);
   const [greyCaps, setGreyCaps] = useState([]);
 
-  const options = {
-    method: "GET",
-    url: "https://random-words5.p.rapidapi.com/getMultipleRandom",
-    params: { count: "2", maxLength: "7" },
-    headers: {
-      "X-RapidAPI-Key": "2a58126853mshd02106ea5d89ef1p1ca5cdjsn30a22734b65d",
-      "X-RapidAPI-Host": "random-words5.p.rapidapi.com",
-    },
+  const getRandomWord = () => {
+    axios
+      .get("https://palabras-aleatorias-public-api.herokuapp.com/random")
+      .then((response) => {
+        console.log(response.data.body.Word);
+        setWord(response.data.body.Word.toUpperCase());
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
+
+  // const options = {
+  //   method: "GET",
+  //   url: "https://random-words5.p.rapidapi.com/getMultipleRandom",
+  //   params: { count: "2", maxLength: "7" },
+  //   headers: {
+  //     "X-RapidAPI-Key": "2a58126853mshd02106ea5d89ef1p1ca5cdjsn30a22734b65d",
+  //     "X-RapidAPI-Host": "random-words5.p.rapidapi.com",
+  //   },
+  // };
 
   useEffect(() => {
     const wordLetters = word.split("");
@@ -34,17 +46,9 @@ const GameScreen = () => {
     setRows(new Array(tries).fill(new Array(wordLetters.length).fill("")));
   }, [word]);
 
-  // useEffect(() => {
-  //   axios
-  //     .request(options)
-  //     .then((response) => {
-  //       console.log(response.data[0]);
-  //       setWord(response.data[0].toUpperCase());
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // }, []);
+  useEffect(() => {
+    getRandomWord();
+  }, []);
 
   const changeBackground = (rowIndex, cellIndex, cell) => {
     if (rowIndex >= currentRow) {
@@ -69,6 +73,7 @@ const GameScreen = () => {
           text: "Jugar de nuevo",
           onPress: () => {
             // GET NEW WORD FROM ENDPOINT
+            getRandomWord();
             setRows(new Array(tries).fill(new Array(letters.length).fill("")));
             setCurrentRow(0);
             setCurrentCell(0);
@@ -79,11 +84,12 @@ const GameScreen = () => {
         },
       ]);
     } else if (currentRow === tries - 1) {
-      Alert.alert("Perdiste!", "", [
+      Alert.alert("Perdiste!", `La palabra era ${word}`, [
         {
           text: "Jugar de nuevo",
           onPress: () => {
             // GET NEW WORD FROM ENDPOINT
+            getRandomWord();
             setRows(new Array(tries).fill(new Array(letters.length).fill("")));
             setCurrentRow(0);
             setCurrentCell(0);
