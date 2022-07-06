@@ -6,7 +6,7 @@ import Keyboard from "../components/Keyboard";
 import axios from "axios";
 
 const GameScreen = () => {
-  const [word, setWord] = useState("");
+  const [word, setWord] = useState("HOLA");
   const [letters, setLetters] = useState([]);
   const [tries, setTries] = useState(6);
   const [rows, setRows] = useState(
@@ -14,6 +14,9 @@ const GameScreen = () => {
   );
   const [currentCell, setCurrentCell] = useState(0);
   const [currentRow, setCurrentRow] = useState(0);
+  const [greenCaps, setGreenCaps] = useState([]);
+  const [yellowCaps, setYellowCaps] = useState([]);
+  const [greyCaps, setGreyCaps] = useState([]);
 
   const options = {
     method: "GET",
@@ -27,20 +30,37 @@ const GameScreen = () => {
 
   useEffect(() => {
     const wordLetters = word.split("");
+    setLetters(wordLetters);
     setRows(new Array(tries).fill(new Array(wordLetters.length).fill("")));
   }, [word]);
 
-  useEffect(() => {
-    axios
-      .request(options)
-      .then((response) => {
-        console.log(response.data[0]);
-        setWord(response.data[0]);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .request(options)
+  //     .then((response) => {
+  //       console.log(response.data[0]);
+  //       setWord(response.data[0].toUpperCase());
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // }, []);
+
+  const changeBackground = (rowIndex, cellIndex, cell) => {
+    if (rowIndex >= currentRow) {
+      return colors.black;
+    }
+    if (cell.toUpperCase() === letters[cellIndex]) {
+      greenCaps.push(cell);
+      return colors.primary;
+    }
+    if (letters.includes(cell.toUpperCase())) {
+      yellowCaps.push(cell);
+      return colors.secondary;
+    }
+    greyCaps.push(cell);
+    return colors.darkgrey;
+  };
 
   const onKeyPressed = (key) => {
     let newArr = [...rows.map((row) => [...row])];
@@ -83,6 +103,11 @@ const GameScreen = () => {
                     borderColor: isCellActive(rowIndex, cellIndex)
                       ? colors.lightgrey
                       : colors.darkgrey,
+                    backgroundColor: changeBackground(
+                      rowIndex,
+                      cellIndex,
+                      cell
+                    ),
                   },
                 ]}
               >
@@ -93,7 +118,12 @@ const GameScreen = () => {
         ))}
       </View>
       <View style={styles.keyboardContainer}>
-        <Keyboard onKeyPressed={onKeyPressed} />
+        <Keyboard
+          onKeyPressed={onKeyPressed}
+          greenCaps={greenCaps}
+          yellowCaps={yellowCaps}
+          greyCaps={greyCaps}
+        />
       </View>
     </View>
   );
